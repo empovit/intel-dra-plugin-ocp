@@ -63,11 +63,31 @@ E.g. `I915_24WW30.4_803.75_23.10.54_231129.55`.
 
 2. (Optional) Select a [firmware release](https://github.com/intel-gpu/intel-gpu-firmware/tags).
 
-3. Update the [#Dockerfile]. The file is based on the
+3. Update [#intel-dgpu-driver.Dockerfile]. The file is based on the
 [upstream Dockerfile](https://github.com/intel/intel-data-center-gpu-driver-for-openshift/blob/main/docker/intel-dgpu-driver.Dockerfile),
 but includes some modifications due to changes in the driver backports.
 
 **Note**: You can try to build the image [outside the cluster](#building-a-driver-image-outside-an-openshift-cluster).
+
+4. Create a configmap from the Dockerfile:
+
+```console
+oc create configmap intel-dgpu-dockerfile-configmap --from-file=intel-dgpu-driver.Dockerfile -n openshift-kmm
+```
+
+5. Set the firmware path to `/var/lib/firmware`:
+
+```
+oc patch configmap kmm-operator-manager-config -n openshift-kmm --type='json' -p='[{"op": "add", "path": "/data/controller_config.yaml", "value": "healthProbeBindAddress: :8081\nmetricsBindAddress: 127.0.0.1:8080\nleaderElection:\n  enabled: true\n  resourceID: kmm.sigs.x-k8s.io\nwebhook:\n  disableHTTP2: true\n  port: 9443\nworker:\n  runAsUser: 0\n  seLinuxType: spc_t\n  setFirmwareClassPath: /var/lib/firmware"}]'
+```
+
+5. Make sure the [OpenShift image registry](https://docs.openshift.com/container-platform/4.16/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html) is enabled and working properly.
+
+6. Create a KMM module for on-premise builds:
+
+```
+oc apply -f https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/kmmo/intel-dgpu-on-premise-build.yaml
+```
 
 ## Building a driver image outside an OpenShift cluster
 
@@ -96,5 +116,5 @@ podman build \
     --build-arg OS_TYPE=rhel_${RHEL_MAJOR} \
     --build-arg KERNEL_FULL_VERSION=${KERNEL_VERSION} \
     -t intel-dgpu-driver:latest \
-    -f Dockerfile
+    -f intel-dgpu-driver.Dockerfile
 ```
