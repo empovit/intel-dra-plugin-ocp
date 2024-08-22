@@ -17,7 +17,8 @@ ARG KERNEL_FULL_VERSION
 # DTK_AUTO is populated automatically with the appropriate DTK image by KMM operator.
 ARG DTK_AUTO
 
-ARG OS_VERSION=9.4
+ARG RHEL_VERSION=9.4
+ARG RHEL_MAJOR=9
 
 FROM ${DTK_AUTO} as builder
 
@@ -25,8 +26,8 @@ ARG I915_RELEASE
 ARG FIRMWARE_RELEASE
 ARG KERNEL_FULL_VERSION
 
-ARG OS_TYPE=rhel_9
-ARG OS_VERSION
+ARG RHEL_MAJOR
+ARG RHEL_VERSION
 
 WORKDIR /build
 
@@ -35,7 +36,7 @@ RUN git clone -b ${I915_RELEASE} --single-branch https://github.com/intel-gpu/in
     && cd intel-gpu-i915-backports \
     && install -D COPYING /licenses/i915/COPYING \
     && export LEX=flex; export YACC=bison \
-    && export OS_TYPE=${OS_TYPE} && export OS_VERSION=${OS_VERSION} \
+    && export OS_TYPE=rhel_${RHEL_MAJOR} && export RHEL_VERSION=${RHEL_VERSION} \
     && export KLIB=/lib/modules/${KERNEL_FULL_VERSION} \
     && export KLIB_BUILD=/lib/modules/${KERNEL_FULL_VERSION}/build \
     && cp defconfigs/i915 .config \
@@ -58,7 +59,7 @@ RUN git clone -b ${FIRMWARE_RELEASE} --single-branch https://github.com/intel-gp
     && install -D /build/intel-gpu-firmware/firmware/pvc* /build/firmware/
 
 # Packaging Intel GPU driver components in the base UBI image for certification
-FROM registry.redhat.io/ubi9/ubi-minimal:${OS_VERSION}
+FROM registry.redhat.io/ubi${RHEL_MAJOR}/ubi-minimal:${RHEL_VERSION}
 ARG DRIVER_VERSION
 ARG KERNEL_FULL_VERSION
 ARG I915_RELEASE

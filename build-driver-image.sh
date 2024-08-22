@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+set -o pipefail
 
 export TARGET_ARCH=x86_64
 export IMAGE_REGISTRY=quay.io/vemporop/intel-data-center-gpu-driver-container
@@ -28,8 +29,8 @@ export IMAGE_NAME=${IMAGE_REGISTRY}:${IMAGE_VERSION}-${KERNEL_VERSION}
 podman build \
     --build-arg KERNEL_FULL_VERSION=$KERNEL_VERSION \
     --build-arg DTK_AUTO=$DTK_AUTO \
-    --build-arg OS_VERSION=$RHEL_VERSION \
-    --build-arg OS_TYPE=rhel_$RHEL_MAJOR \
+    --build-arg RHEL_VERSION=$RHEL_VERSION \
+    --build-arg RHEL_MAJOR=$RHEL_MAJOR \
     --build-arg I915_RELEASE=I915_24WW30.4_803.75_23.10.54_231129.55 \
     --build-arg FIRMWARE_RELEASE=24WW20.5_881.12 \
     -t $IMAGE_NAME -f intel-dgpu-driver.Dockerfile
