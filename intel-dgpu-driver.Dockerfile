@@ -39,11 +39,12 @@ RUN git clone -b ${I915_RELEASE} --single-branch https://github.com/intel-gpu/in
     && export OS_TYPE=rhel_${RHEL_MAJOR} && export RHEL_VERSION=${RHEL_VERSION} \
     && export KLIB=/lib/modules/${KERNEL_FULL_VERSION} \
     && export KLIB_BUILD=/lib/modules/${KERNEL_FULL_VERSION}/build \
-    && cp defconfigs/i915 .config \
-    && make olddefconfig && make modules -j $(nproc) && make modules_install
+    && make binrpm-pkg
+
+RUN dnf install -y $HOME/rpmbuild/RPMS/x86_64/*.rpm
 
 # Copy out-of-tree drivers to /opt/lib/modules/${KERNEL_FULL_VERSION}/
-RUN for file in $(find /lib/modules/${KERNEL_FULL_VERSION}/updates/ -name "*.ko"); do \
+RUN for file in $(find /lib/modules/${KERNEL_FULL_VERSION}/updates/ -name "*.ko" -o -name "*.ko.xz"); do \
     cp $file /opt --parents; done
 
 # Create the symbolic link for in-tree dependencies

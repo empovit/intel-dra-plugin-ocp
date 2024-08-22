@@ -116,8 +116,8 @@ podman build \
     --build-arg DTK_AUTO=${DTK_IMAGE} \
     --build-arg I915_RELEASE=I915_24WW30.4_803.75_23.10.54_231129.55 \
     --build-arg FIRMWARE_RELEASE=24WW20.5_881.12 \
-    --build-arg OS_VERSION=${RHEL_VERSION} \
-    --build-arg OS_TYPE=rhel_${RHEL_MAJOR} \
+    --build-arg RHEL_VERSION=${RHEL_VERSION} \
+    --build-arg RHEL_MAJOR=${RHEL_MAJOR} \
     --build-arg KERNEL_FULL_VERSION=${KERNEL_VERSION} \
     -t intel-dgpu-driver:latest \
     -f intel-dgpu-driver.Dockerfile
