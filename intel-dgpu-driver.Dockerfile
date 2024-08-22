@@ -76,7 +76,8 @@ LABEL description="Intel® Data Center GPU Driver container image designed for R
 The driver container is based on Intel Data Center GPU driver components - i915 driver release:${I915_RELEASE}, \
 and Firmware release:${FIRMWARE_RELEASE}. This driver container image is supported for RHOCP 4.14 RHCOS kernel version: ${KERNEL_FULL_VERSION}."
 
-RUN microdnf update -y --disableplugin=subscription-manager && rm -rf /var/cache/yum
+# This line causes `error: Error -1 running transaction`, removing it for now
+# RUN microdnf update -y --disableplugin=subscription-manager && rm -rf /var/cache/yum
 RUN microdnf -y install kmod findutils && microdnf clean all
 COPY --from=builder /licenses/ /licenses/
 COPY --from=builder /opt/lib/modules/${KERNEL_FULL_VERSION}/ /opt/lib/modules/${KERNEL_FULL_VERSION}/

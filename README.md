@@ -1,4 +1,7 @@
-# DRA feature gate
+WARNING: This repository is a work in progress. Things may not work!
+===
+
+## DRA feature gate
 
 For DRA, enable the DRA feature gate either when installing the cluster, or by running:
 
@@ -12,7 +15,7 @@ or
 oc apply -f dra-feature-gate.yml
 ```
 
-# Setting up OpenShift cluster for Intel products
+## Setting up OpenShift cluster for Intel products
 
 Reference: [Intel® Technology Enabling for OpenShift](https://github.com/intel/intel-technology-enabling-for-openshift).
 
@@ -46,7 +49,7 @@ Reference: [Intel® Technology Enabling for OpenShift](https://github.com/intel/
     oc apply -f kmm-operator.yml
     ```
 
-# Intel GPU drivers
+## Intel GPU drivers
 
 Reference:
 - [Intel® Data Center GPU Driver for OpenShift](https://github.com/intel/intel-data-center-gpu-driver-for-openshift)
@@ -77,7 +80,7 @@ oc create configmap intel-dgpu-dockerfile-configmap --from-file=intel-dgpu-drive
 
 5. Set the firmware path to `/var/lib/firmware`:
 
-```
+```console
 ./update-firmware-path.sh
 ```
 
@@ -89,9 +92,35 @@ It will patch the KMM configmap and restart the pods.
 
 6. Create a KMM module for on-premise builds:
 
-```
+```console
 oc apply -f https://raw.githubusercontent.com/intel/intel-technology-enabling-for-openshift/main/kmmo/intel-dgpu-on-premise-build.yaml
 ```
+
+7. Wait for the build to finish (there will be a pod in the `openshift-kmm` namespace). Then check the node labels:
+
+```console
+oc get nodes -l kmm.node.kubernetes.io/openshift-kmm.intel-dgpu-on-premise-build.ready
+```
+
+Note that the label is different with [pre-build mode](https://github.com/intel/intel-technology-enabling-for-openshift/tree/main/kmmo#deploy-intel-data-center-gpu-driver-with-pre-build-mode):
+
+```console
+oc get nodes -l kmm.node.kubernetes.io/openshift-kmm.intel-dgpu.ready
+```
+
+## Intel DRA Plugin
+
+**Note**: The plugin version supported by OpenShift 4.16 is [0.4.0](https://github.com/intel/intel-resource-drivers-for-kubernetes/tree/v0.4.0).
+Later versions use a newer Kubernetes API and will not run on OpenShift.
+
+## Intel Device Plugin Operator
+
+The "classic" Kubernetes device plugin can be used as an alternative to DRA, for instance for verifying the hardware, drivers, and cluster setup.
+
+Reference:
+- [Setting up Intel Device Plugins Operator](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/device_plugins/README.md)
+- [Intel Device Plugin for Kubernetes](https://github.com/intel/intel-device-plugins-for-kubernetes)
+- [Verify Intel® Data Center GPU provisioning](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/tests/l2/dgpu/README.md)
 
 ## Building a driver image outside an OpenShift cluster
 
@@ -111,7 +140,7 @@ export KERNEL_VERSION=$(podman run --authfile $HOME/pull-secret.txt --rm -ti ${D
 
 3. Run the build:
 
-```
+```console
 podman build \
     --build-arg DTK_AUTO=${DTK_IMAGE} \
     --build-arg I915_RELEASE=I915_24WW30.4_803.75_23.10.54_231129.55 \
