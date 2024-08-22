@@ -78,15 +78,19 @@ oc create configmap intel-dgpu-dockerfile-configmap --from-file=intel-dgpu-drive
 5. Set the firmware path to `/var/lib/firmware`:
 
 ```
-oc patch configmap kmm-operator-manager-config -n openshift-kmm --type='json' -p='[{"op": "add", "path": "/data/controller_config.yaml", "value": "healthProbeBindAddress: :8081\nmetricsBindAddress: 127.0.0.1:8080\nleaderElection:\n  enabled: true\n  resourceID: kmm.sigs.x-k8s.io\nwebhook:\n  disableHTTP2: true\n  port: 9443\nworker:\n  runAsUser: 0\n  seLinuxType: spc_t\n  setFirmwareClassPath: /var/lib/firmware"}]'
+./update-firmware-path.sh
 ```
+
+It will patch the KMM configmap and restart the pods.
+
+**Note**: This will not be required anymore with the KMM Operator version 2.2.
 
 5. Make sure the [OpenShift image registry](https://docs.openshift.com/container-platform/4.16/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html) is enabled and working properly.
 
 6. Create a KMM module for on-premise builds:
 
 ```
-oc apply -f https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/kmmo/intel-dgpu-on-premise-build.yaml
+oc apply -f https://raw.githubusercontent.com/intel/intel-technology-enabling-for-openshift/main/kmmo/intel-dgpu-on-premise-build.yaml
 ```
 
 ## Building a driver image outside an OpenShift cluster
