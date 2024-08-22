@@ -122,3 +122,17 @@ podman build \
     -t intel-dgpu-driver:latest \
     -f intel-dgpu-driver.Dockerfile
 ```
+
+## Useful commands
+
+- List KMM custom resources:
+
+    ```console
+    for r in $(oc api-resources --verbs=list -o name | grep kmm); do oc get $r -A; done
+    ```
+
+- Delete KMM pods and get them re-created:
+
+    ```console
+    oc delete pods -n openshift-kmm -l app.kubernetes.io/component=kmm
+    ```
