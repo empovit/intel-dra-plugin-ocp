@@ -51,6 +51,19 @@ Reference: [Intel® Technology Enabling for OpenShift](https://github.com/intel/
 
 ## Intel GPU drivers
 
+This guide focuses on building and installing out-of-tree drivers for not yet supported GPU models and/or kernel versions.
+Check out the list of [supported hardware](https://dgpu-docs.intel.com/devices/hardware-table.html) to see if working
+drivers might be already available on the node.
+
+Here is an example of a GPU/kernel unsupported by the installed i915 driver:
+
+```console
+$ dmesg | grep -i i915
+[    4.246825] i915 0000:06:00.0: Your graphics device 56c0 is not properly supported by i915 in this
+               kernel version. To force driver probe anyway, use i915.force_probe=56c0
+               module parameter or CONFIG_DRM_I915_FORCE_PROBE=56c0 configuration option,
+```
+
 Reference:
 - [Intel® Data Center GPU Driver for OpenShift](https://github.com/intel/intel-data-center-gpu-driver-for-openshift)
 - [Intel® Graphics Driver Backports for Linux® OS (intel-gpu-i915-backports)](https://github.com/intel-gpu/intel-gpu-i915-backports)
@@ -90,13 +103,19 @@ It will patch the KMM configmap and restart the pods.
 
 5. Make sure the [OpenShift image registry](https://docs.openshift.com/container-platform/4.16/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html) is enabled and working properly.
 
-6. Create a KMM module for on-premise builds:
+6. Label a GPU node for canary deployment:
 
 ```console
-oc apply -f https://raw.githubusercontent.com/intel/intel-technology-enabling-for-openshift/main/kmmo/intel-dgpu-on-premise-build.yaml
+oc label node <node> intel.feature.node.kubernetes.io/dgpu-canary=true
 ```
 
-7. Wait for the build to finish (there will be a pod in the `openshift-kmm` namespace). Then check the node labels:
+7. Create a KMM module for on-premise builds. It's based on the [upstream module](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/kmmo/intel-dgpu-on-premise-build.yaml), but will unload any in-tree `i915` module that might not support the GPU model:
+
+```console
+oc apply -f intel-dgpu-on-premise-build.yaml
+```
+
+8. Wait for the build to finish (there will be a pod in the `openshift-kmm` namespace). Then check the node labels:
 
 ```console
 oc get nodes -l kmm.node.kubernetes.io/openshift-kmm.intel-dgpu-on-premise-build.ready
