@@ -1,7 +1,6 @@
-
+# Intel GPU on OpenShift: out-of-tree drivers, DRA plugin, Kubernetes device plugin
 
 > WARNING: This repository is a work in progress. Things may not work!
-
 
 ## Enabling DRA
 
@@ -131,8 +130,20 @@ oc get nodes -l kmm.node.kubernetes.io/openshift-kmm.intel-dgpu.ready
 
 ## Intel DRA Plugin
 
+Reference:
+- [Intel resource drivers for Kubernetes](https://github.com/intel/intel-resource-drivers-for-kubernetes)
+
 **Note**: The plugin version supported by OpenShift 4.16 is [0.4.0](https://github.com/intel/intel-resource-drivers-for-kubernetes/tree/v0.4.0).
 Later versions use a newer Kubernetes API and will not run on OpenShift.
+
+When installing the plugin, the deployment must be modified to allow the service account to use `hostPath`, which requires privileged access on OpenShift.
+A straightforward (although making the service account too powerful) way of doing so is to run the container that uses `hostPath` volumes as privileged:
+
+1. Bind the ClusterRole `system:openshift:scc:privileged` the plugin's service account
+([example](https://github.com/empovit/intel-resource-drivers-for-kubernetes/blob/37c73b9a424712eb4a8c1f89d9fed7748260e520/deployments/gpu/openshift-privileged-clusterrolebinding.yaml)).
+
+2. Change the `kubelet-plugin` container's security context in `deployments/gpu/resource-driver.yaml` to `privileged: true`
+([example](https://github.com/empovit/intel-resource-drivers-for-kubernetes/blob/37c73b9a424712eb4a8c1f89d9fed7748260e520/deployments/gpu/resource-driver.yaml#L79)).
 
 ## Intel Device Plugin Operator
 
