@@ -1,18 +1,20 @@
-WARNING: This repository is a work in progress. Things may not work!
-===
 
-## DRA feature gate
 
-For DRA, enable the DRA feature gate either when installing the cluster, or by running:
+> WARNING: This repository is a work in progress. Things may not work!
+
+
+## Enabling DRA
+
+Enable the DRA feature gate either when installing the cluster, or post-install:
 
 ```console
 oc patch --type merge -p '{"spec":{"featureSet":"TechPreviewNoUpgrade"}}' featuregate cluster
 ```
 
-or
+Enable the DRA scheduler profile:
 
 ```console
-oc apply -f dra-feature-gate.yml
+oc patch --type merge -p '{"spec":{"profile": "HighNodeUtilization", "profileCustomizations": {"dynamicResourceAllocation": "Enabled"}}}' scheduler cluster
 ```
 
 ## Setting up OpenShift cluster for Intel products
@@ -75,9 +77,9 @@ so we're going to use the on-premise mode.
 
 1. Check which branch/tag has support for your operating system and kernel:
 [Active LTS/Production releases](https://github.com/intel-gpu/intel-gpu-i915-backports?tab=readme-ov-file#active-ltsproduction-releases).
-E.g. `I915_24WW30.4_803.75_23.10.54_231129.55`.
+E.g. `I915_24WW30.4_803.75_23.10.54_231129.55`, or `backport/main` for the latest drivers for Red Hat Enterprise Linux.
 
-2. (Optional) Select a [firmware release](https://github.com/intel-gpu/intel-gpu-firmware/tags).
+2. (Optional) Select a [firmware release](https://github.com/intel-gpu/intel-gpu-firmware/tags). You can also use `main`.
 
 3. Update [#intel-dgpu-driver.Dockerfile]. The file is based on the
 [upstream Dockerfile](https://github.com/intel/intel-data-center-gpu-driver-for-openshift/blob/main/docker/intel-dgpu-driver.Dockerfile),
