@@ -80,7 +80,7 @@ E.g. `I915_24WW30.4_803.75_23.10.54_231129.55`, or `backport/main` for the lates
 
 2. (Optional) Select a [firmware release](https://github.com/intel-gpu/intel-gpu-firmware/tags). You can also use `main`.
 
-3. Update [#intel-dgpu-driver.Dockerfile]. The file is based on the
+3. Update [intel-dgpu-driver.Dockerfile](intel-dgpu-driver.Dockerfile). The file is based on the
 [upstream Dockerfile](https://github.com/intel/intel-data-center-gpu-driver-for-openshift/blob/main/docker/intel-dgpu-driver.Dockerfile),
 but includes some modifications due to changes in the driver backports.
 
