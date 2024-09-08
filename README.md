@@ -89,7 +89,7 @@ but includes some modifications due to changes in the driver backports.
 4. Create a configmap from the Dockerfile:
 
 ```console
-oc create configmap intel-dgpu-dockerfile-configmap --from-file=intel-dgpu-driver.Dockerfile -n openshift-kmm
+oc create configmap intel-dgpu-dockerfile-configmap --from-file=dockerfile=intel-dgpu-driver.Dockerfile -n openshift-kmm
 ```
 
 5. Set the firmware path to `/var/lib/firmware`:
